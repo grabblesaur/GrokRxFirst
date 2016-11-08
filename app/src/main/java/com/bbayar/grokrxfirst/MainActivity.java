@@ -2,25 +2,32 @@ package com.bbayar.grokrxfirst;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.widget.TextView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
+import com.bbayar.grokrxfirst.adapter.CheeseAdapter;
+import com.bbayar.grokrxfirst.adapter.ResultAdapter;
 import com.bbayar.grokrxfirst.tasks.Task1;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "global";
 
-    @BindView(R.id.tv1)
-    TextView textView;
+    @BindView(R.id.cheese_recyclerview)
+    RecyclerView cheeseRecyclerView;
 
-    private Subscription task1Subscription;
+    @BindView(R.id.result_recyclerview)
+    RecyclerView resultRecyclerView;
+
+    private CompositeSubscription compositeSubscription;
+    private List<String> cheeses;
+    private List<String> results;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,25 +35,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        List<String> cheeses = Cheeses.randomList(5);
-        for (String c : cheeses) {
-            Log.i(TAG, "cheese: " + c);
-        }
+        cheeseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        cheeseRecyclerView.setAdapter(new CheeseAdapter(cheeses));
+
+        resultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        resultRecyclerView.setAdapter(new ResultAdapter(results));
     }
 
-    // TODO: реализовать подписку на задачи, а также их корректную обработку.
     public void subscribeToTask1(List<String> list) {
         Task1 task1 = new Task1(list);
-        task1Subscription = task1.getLengthOfStringsWithR()
-                .subscribe(i -> task1.getLengthsOfR().add(i));
+        compositeSubscription.add(task1
+                .getLengthOfStringsWithR()
+                .subscribe(i -> task1.getLengthsOfR().add(i)));
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        /**
-         * TODO: реализовать список подписок, от которых нужно отписываться с проверкой условия
-         */
-        task1Subscription.unsubscribe();
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeSubscription.unsubscribe();
     }
 }
