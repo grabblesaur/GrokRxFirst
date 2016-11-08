@@ -2,7 +2,6 @@ package com.bbayar.grokrxfirst.tasks;
 
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
@@ -15,26 +14,25 @@ import rx.Observable;
 public class Task1 {
 
     private List<String> list;
-    private List<Integer> lengthsOfR;
 
     public Task1(List<String> list) {
         this.list = list;
-        lengthsOfR = new ArrayList<>();
     }
 
     @NonNull
     public Observable<Integer> getLengthOfStringsWithR() {
         return Observable.from(list)
                 .map(String::toLowerCase)
-                .filter(s -> s.contains("r"))
-                .map(String::length);
+                .map(s -> {
+                    if (s.contains("r")) {
+                        return s.length();
+                    } else {
+                        return null;
+                    }
+                });
     }
 
     public List<String> getList() {
         return list;
-    }
-
-    public List<Integer> getLengthsOfR() {
-        return lengthsOfR;
     }
 }
