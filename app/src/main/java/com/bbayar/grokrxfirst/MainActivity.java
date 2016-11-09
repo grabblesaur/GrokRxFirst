@@ -8,12 +8,15 @@ import android.support.v7.widget.RecyclerView;
 import com.bbayar.grokrxfirst.adapter.CheeseAdapter;
 import com.bbayar.grokrxfirst.adapter.ResultAdapter;
 import com.bbayar.grokrxfirst.tasks.Task1;
+import com.bbayar.grokrxfirst.tasks.Task2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
 import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView resultRecyclerView;
 
     private CompositeSubscription compositeSubscription = new CompositeSubscription();
-    private List<String> cheeses, results;
+    private List<String> inputList, resultList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,16 +38,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        cheeses = Cheeses.randomList(100);
-        results = new ArrayList<>();
+//        inputList = Cheeses.randomList(100);
+        inputList = new ArrayList<>();
+        resultList = new ArrayList<>();
+
+        //temporary method for task2
+        initInputList();
 
         cheeseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        cheeseRecyclerView.setAdapter(new CheeseAdapter(cheeses));
+        cheeseRecyclerView.setAdapter(new CheeseAdapter(inputList));
 
         resultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        resultRecyclerView.setAdapter(new ResultAdapter(results));
+        resultRecyclerView.setAdapter(new ResultAdapter(resultList));
 
-        subscribeToTask1(cheeses);
+//        subscribeToTask1(inputList);
+        subscribeToTask2(inputList);
+    }
+
+    private void initInputList() {
+        String[] temp = {"John", "Sam", "Smith", "Richard", "Alex", "Sam", "Smith", "END"};
+        inputList = Arrays.asList(temp);
     }
 
     public void subscribeToTask1(List<String> list) {
@@ -53,10 +66,20 @@ public class MainActivity extends AppCompatActivity {
                 .getLengthOfStringsWithR()
                 .map(String::valueOf)
                 .subscribe(s -> {
-                    results.add(s);
+                    resultList.add(s);
                     resultRecyclerView.getAdapter().notifyItemInserted(0);
-                    resultRecyclerView.getAdapter().notifyItemRangeChanged(0, results.size());
+                    resultRecyclerView.getAdapter().notifyItemRangeChanged(0, resultList.size());
                 }));
+    }
+
+    public void subscribeToTask2(List<String> list) {
+        Task2 task2 = new Task2(Observable.from(list));
+        task2.getUniqueStringsBeforeEnd()
+                .subscribe(s -> {
+                    resultList.add(s);
+                    resultRecyclerView.getAdapter().notifyItemInserted(0);
+                    resultRecyclerView.getAdapter().notifyItemRangeChanged(0, resultList.size());
+                });
     }
 
     @Override

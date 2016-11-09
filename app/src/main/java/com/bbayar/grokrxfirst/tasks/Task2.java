@@ -19,8 +19,10 @@ public class Task2 {
         this.observable = observable;
     }
 
-    public Observable<String> getUniqueStringsBeforeEnd(Observable<String> o) {
-        return o.takeUntil(s -> s.equals("END"))
+    public Observable<String> getUniqueStringsBeforeEnd() {
+        return observable
+                .map(String::toLowerCase)
+                .takeUntil(s -> s.equals("END"))
                 .distinct();
     }
 }
