@@ -4,6 +4,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.bbayar.grokrxfirst.adapter.CheeseAdapter;
 import com.bbayar.grokrxfirst.adapter.ResultAdapter;
@@ -23,8 +27,11 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "global";
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
     @BindView(R.id.cheese_recyclerview)
-    RecyclerView cheeseRecyclerView;
+    RecyclerView inputRecyclerView;
 
     @BindView(R.id.result_recyclerview)
     RecyclerView resultRecyclerView;
@@ -37,27 +44,45 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
 
-//        inputList = Cheeses.randomList(100);
         inputList = new ArrayList<>();
         resultList = new ArrayList<>();
 
-        //temporary method for task2
-        initInputList();
-
-        cheeseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        cheeseRecyclerView.setAdapter(new CheeseAdapter(inputList));
+        inputRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        inputRecyclerView.setAdapter(new CheeseAdapter(inputList));
 
         resultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         resultRecyclerView.setAdapter(new ResultAdapter(resultList));
-
-//        subscribeToTask1(inputList);
-        subscribeToTask2(inputList);
     }
 
-    private void initInputList() {
-        String[] temp = {"John", "Sam", "Smith", "Richard", "Alex", "Sam", "Smith", "END"};
-        inputList = Arrays.asList(temp);
+    private void initInputList(String taskName) {
+        resetLists();
+        switch (taskName) {
+            case "task1":
+                inputList.addAll(Cheeses.randomList(25));
+                inputRecyclerView.getAdapter().notifyItemInserted(0);
+                inputRecyclerView.getAdapter().notifyItemRangeChanged(0, inputList.size());
+                subscribeToTask1(inputList);
+                break;
+
+            case "task2":
+                String[] temp = {"John", "Sam", "Smith", "Richard", "Alex", "Sam", "Smith", "END"};
+                inputList.addAll(Arrays.asList(temp));
+                inputRecyclerView.getAdapter().notifyItemInserted(0);
+                inputRecyclerView.getAdapter().notifyItemRangeChanged(0, inputList.size());
+                subscribeToTask2(inputList);
+                break;
+        }
+    }
+
+    private void resetLists() {
+        inputList.clear();
+        inputRecyclerView.getAdapter().notifyItemRemoved(0);
+        inputRecyclerView.getAdapter().notifyItemRangeRemoved(0, inputList.size());
+        resultList.clear();
+        resultRecyclerView.getAdapter().notifyItemRemoved(0);
+        resultRecyclerView.getAdapter().notifyItemRangeRemoved(0, resultList.size());
     }
 
     public void subscribeToTask1(List<String> list) {
@@ -80,6 +105,38 @@ public class MainActivity extends AppCompatActivity {
                     resultRecyclerView.getAdapter().notifyItemInserted(0);
                     resultRecyclerView.getAdapter().notifyItemRangeChanged(0, resultList.size());
                 });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        int id = item.getItemId();
+        String task = "";
+
+        switch (id) {
+            case R.id.task1:
+                task = "task1";
+                break;
+            case R.id.task2:
+                task = "task2";
+                break;
+            case R.id.task3:
+                task = "task3";
+                break;
+            case R.id.task4:
+                task = "task4";
+                break;
+        }
+        initInputList(task);
+        Toast.makeText(this, "doing " + task, Toast.LENGTH_SHORT).show();
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
