@@ -13,11 +13,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class CheeseAdapter extends RecyclerView.Adapter<CheeseAdapter.CheeseViewHolder> {
+public class InputAdapter extends RecyclerView.Adapter<InputAdapter.CheeseViewHolder> {
 
     private List<String> cheeses;
 
-    public CheeseAdapter(List<String> cheeses) {
+    public InputAdapter(List<String> cheeses) {
         this.cheeses = cheeses;
     }
 

@@ -21,8 +21,7 @@ public class Task2 {
 
     public Observable<String> getUniqueStringsBeforeEnd() {
         return observable
-                .map(String::toLowerCase)
-                .takeUntil(s -> s.equals("END"))
+                .takeWhile(s -> !s.equals("END"))
                 .distinct();
     }
 }

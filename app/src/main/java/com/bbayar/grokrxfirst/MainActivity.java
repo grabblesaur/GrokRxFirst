@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.bbayar.grokrxfirst.adapter.CheeseAdapter;
+import com.bbayar.grokrxfirst.adapter.InputAdapter;
 import com.bbayar.grokrxfirst.adapter.ResultAdapter;
 import com.bbayar.grokrxfirst.tasks.Task1;
 import com.bbayar.grokrxfirst.tasks.Task2;
@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     private CompositeSubscription compositeSubscription = new CompositeSubscription();
     private List<String> inputList, resultList;
+    private InputAdapter inputAdapter;
+    private ResultAdapter resultAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,40 +51,57 @@ public class MainActivity extends AppCompatActivity {
         inputList = new ArrayList<>();
         resultList = new ArrayList<>();
 
+        inputAdapter = new InputAdapter(inputList);
         inputRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        inputRecyclerView.setAdapter(new CheeseAdapter(inputList));
+        inputRecyclerView.setAdapter(inputAdapter);
 
+        resultAdapter = new ResultAdapter(resultList);
         resultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        resultRecyclerView.setAdapter(new ResultAdapter(resultList));
+        resultRecyclerView.setAdapter(resultAdapter);
     }
 
     private void initInputList(String taskName) {
-        resetLists();
+
+        if (!inputList.isEmpty()&& !resultList.isEmpty()) {
+            resetData();
+        }
+
         switch (taskName) {
             case "task1":
                 inputList.addAll(Cheeses.randomList(25));
-                inputRecyclerView.getAdapter().notifyItemInserted(0);
-                inputRecyclerView.getAdapter().notifyItemRangeChanged(0, inputList.size());
+                notifyDataWasAdded(inputAdapter, inputList);
                 subscribeToTask1(inputList);
                 break;
 
             case "task2":
                 String[] temp = {"John", "Sam", "Smith", "Richard", "Alex", "Sam", "Smith", "END"};
                 inputList.addAll(Arrays.asList(temp));
-                inputRecyclerView.getAdapter().notifyItemInserted(0);
-                inputRecyclerView.getAdapter().notifyItemRangeChanged(0, inputList.size());
+                notifyDataWasAdded(inputAdapter, inputList);
                 subscribeToTask2(inputList);
                 break;
         }
     }
 
-    private void resetLists() {
-        inputList.clear();
-        inputRecyclerView.getAdapter().notifyItemRemoved(0);
-        inputRecyclerView.getAdapter().notifyItemRangeRemoved(0, inputList.size());
-        resultList.clear();
-        resultRecyclerView.getAdapter().notifyItemRemoved(0);
-        resultRecyclerView.getAdapter().notifyItemRangeRemoved(0, resultList.size());
+    private void resetData() {
+        int inputSize = inputList.size();
+        int resultSize = resultList.size();
+        if (inputSize > 0 || resultSize > 0) {
+
+            for (int i = 0; i < inputSize; i++) {
+                inputList.remove(0);
+            }
+            inputAdapter.notifyItemRangeRemoved(0, inputSize);
+
+            for (int j = 0; j < resultSize; j++) {
+                resultList.remove(0);
+            }
+            resultAdapter.notifyItemRangeRemoved(0, resultSize);
+        }
+    }
+
+    public void notifyDataWasAdded(RecyclerView.Adapter adapter, List<String> list) {
+        adapter.notifyItemInserted(0);
+        adapter.notifyItemRangeChanged(0, list.size());
     }
 
     public void subscribeToTask1(List<String> list) {
@@ -92,9 +111,8 @@ public class MainActivity extends AppCompatActivity {
                 .map(String::valueOf)
                 .subscribe(s -> {
                     resultList.add(s);
-                    resultRecyclerView.getAdapter().notifyItemInserted(0);
-                    resultRecyclerView.getAdapter().notifyItemRangeChanged(0, resultList.size());
                 }));
+        notifyDataWasAdded(resultAdapter, resultList);
     }
 
     public void subscribeToTask2(List<String> list) {
@@ -102,9 +120,8 @@ public class MainActivity extends AppCompatActivity {
         task2.getUniqueStringsBeforeEnd()
                 .subscribe(s -> {
                     resultList.add(s);
-                    resultRecyclerView.getAdapter().notifyItemInserted(0);
-                    resultRecyclerView.getAdapter().notifyItemRangeChanged(0, resultList.size());
                 });
+        notifyDataWasAdded(resultAdapter, resultList);
     }
 
     @Override
