@@ -13,10 +13,13 @@ import com.bbayar.grokrxfirst.adapter.InputAdapter;
 import com.bbayar.grokrxfirst.adapter.ResultAdapter;
 import com.bbayar.grokrxfirst.tasks.Task1;
 import com.bbayar.grokrxfirst.tasks.Task2;
+import com.bbayar.grokrxfirst.tasks.Task3;
+import com.bbayar.grokrxfirst.tasks.Task4;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -79,6 +82,24 @@ public class MainActivity extends AppCompatActivity {
                 notifyDataWasAdded(inputAdapter, inputList);
                 subscribeToTask2(inputList);
                 break;
+
+            case "task3":
+                // need to init inputList with random integers
+                Random r = new Random(47);
+                int size = r.nextInt(10);
+                for (int i = 0; i < size; i++) {
+                    inputList.add(String.valueOf(r.nextInt(10)));
+                }
+                notifyDataWasAdded(inputAdapter, inputList);
+                subscribeToTask3(inputList);
+                break;
+
+            case "task4":
+                String[] tempArray = {"true", "1", "2", "41", "123", "5", "21"};
+                inputList.addAll(Arrays.asList(tempArray));
+                notifyDataWasAdded(inputAdapter, inputList);
+                subscribeToTask4(inputList);
+                break;
         }
     }
 
@@ -121,6 +142,32 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(s -> {
                     resultList.add(s);
                 });
+        notifyDataWasAdded(resultAdapter, resultList);
+    }
+
+    public void subscribeToTask3(List<String> list) {
+        List<Integer> listInteger = new ArrayList<>(list.size());
+        for (String l : list) {
+            listInteger.add(Integer.valueOf(l));
+        }
+        Task3.sum(Observable.from(listInteger))
+                .subscribe(i -> {
+                    resultList.add(String.valueOf(i));
+                });
+        notifyDataWasAdded(resultAdapter, resultList);
+    }
+
+    public void subscribeToTask4(List<String> list) {
+        Boolean flag = Boolean.valueOf(list.get(0));
+        Integer[] first = {Integer.valueOf(list.get(1)), Integer.valueOf(list.get(2)), Integer.valueOf(list.get(3))};
+        Integer[] second = {Integer.valueOf(list.get(4)), Integer.valueOf(list.get(5)), Integer.valueOf(list.get(6))};
+        Task4.task4(Observable.just(flag), Observable.from(first), Observable.from(second))
+                .subscribe(i -> {
+                    resultList.add(String.valueOf(i));
+                },
+                        throwable -> {
+                            resultList.add("Exception");
+                        });
         notifyDataWasAdded(resultAdapter, resultList);
     }
 

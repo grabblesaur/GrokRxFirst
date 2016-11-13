@@ -1,6 +1,7 @@
 package com.bbayar.grokrxfirst.tasks;
 
 import rx.Observable;
+import rx.observables.MathObservable;
 
 /**
  * Sum all elements from observable and return observable
@@ -14,7 +15,7 @@ import rx.Observable;
 public class Task3 {
 
     public static Observable<Integer> sum(Observable<Integer> observable) {
-        return Observable.just(1,2,3,4,5);
+        return MathObservable.sumInteger(observable);
     }
 
 }
