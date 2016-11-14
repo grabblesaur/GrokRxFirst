@@ -30,7 +30,13 @@ public class Task4 {
                                             Observable<Integer> secondStream) {
 
         return flagObserver
-                .flatMap(b -> b ? firstStream : secondStream);
+                .flatMap(b -> b ? firstStream : secondStream)
+                .map(integer -> {
+                    if (integer > 99) {
+                        throw new RuntimeException();
+                    }
+                    return integer;
+                });
     }
 
 }

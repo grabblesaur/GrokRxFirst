@@ -14,5 +14,10 @@
     <item
         android:id="@+id/task4"
         android:title="task4"/>
-
+    <item
+        android:id="@+id/task5"
+        android:title="task5"/>
+    <item
+        android:id="@+id/task6"
+        android:title="task6"/>
 </menu>

@@ -15,6 +15,7 @@ import com.bbayar.grokrxfirst.tasks.Task1;
 import com.bbayar.grokrxfirst.tasks.Task2;
 import com.bbayar.grokrxfirst.tasks.Task3;
 import com.bbayar.grokrxfirst.tasks.Task4;
+import com.bbayar.grokrxfirst.tasks.Task5;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,10 +96,26 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case "task4":
-                String[] tempArray = {"true", "1", "2", "41", "123", "5", "21"};
+                String[] tempArray = {"false", "1", "2", "41", "12", "509", "21"};
                 inputList.addAll(Arrays.asList(tempArray));
                 notifyDataWasAdded(inputAdapter, inputList);
                 subscribeToTask4(inputList);
+                break;
+
+            case "task5":
+                Integer[] task5First = {100, 17, 63};
+                Integer[] task5Second = {15, 89, 27};
+
+                for (int i = 0; i < (task5First.length + task5Second.length); i++) {
+                    if (i < task5First.length) {
+                        inputList.add(String.valueOf(task5First[i]));
+                    } else {
+                        inputList.add(String.valueOf(task5Second[i]));
+                    }
+                }
+
+                notifyDataWasAdded(inputAdapter, inputList);
+                subscribeToTask5(task5First, task5Second);
                 break;
         }
     }
@@ -161,13 +178,23 @@ public class MainActivity extends AppCompatActivity {
         Boolean flag = Boolean.valueOf(list.get(0));
         Integer[] first = {Integer.valueOf(list.get(1)), Integer.valueOf(list.get(2)), Integer.valueOf(list.get(3))};
         Integer[] second = {Integer.valueOf(list.get(4)), Integer.valueOf(list.get(5)), Integer.valueOf(list.get(6))};
-        Task4.task4(Observable.just(flag), Observable.from(first), Observable.from(second))
-                .subscribe(i -> {
-                    resultList.add(String.valueOf(i));
-                },
+        Task4.task4(
+                Observable.just(flag),
+                Observable.from(first),
+                Observable.from(second))
+                .subscribe(
+                        i -> {
+                            resultList.add(String.valueOf(i));
+                        },
                         throwable -> {
                             resultList.add("Exception");
                         });
+        notifyDataWasAdded(resultAdapter, resultList);
+    }
+
+    private void subscribeToTask5(Integer[] first, Integer[] second) {
+        Task5.gcdsObservable(Observable.from(first), Observable.from(second))
+                .subscribe(integer -> resultList.add(String.valueOf(integer)));
         notifyDataWasAdded(resultAdapter, resultList);
     }
 
